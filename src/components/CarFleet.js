@@ -6,6 +6,8 @@ const CarFleet = ({ filters = {} }) => {
   const [showDetails, setShowDetails] = useState(false);
   const [showBookingPage, setShowBookingPage] = useState(false);
   const [currentBookingCar, setCurrentBookingCar] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [showMyBookings, setShowMyBookings] = useState(false);
 
   // Wrap cars array in useMemo to prevent unnecessary re-renders
   const cars = useMemo(() => [
@@ -470,8 +472,17 @@ const CarFleet = ({ filters = {} }) => {
 
     const handleBookingSubmit = (e) => {
       e.preventDefault();
-      alert(`Booking confirmed for ${currentBookingCar.name}! We'll contact you soon.`);
+      // Store booking in state
+      setBookings(prev => [
+        ...prev,
+        {
+          car: currentBookingCar,
+          ...bookingData,
+          id: Date.now()
+        }
+      ]);
       closeBookingPage();
+      setShowMyBookings(true);
     };
 
     return (
@@ -517,9 +528,64 @@ const CarFleet = ({ filters = {} }) => {
     );
   };
 
+  // My Bookings Section
+  const MyBookingsSection = () => (
+    <section className="my-bookings" id="my-bookings">
+      <div className="container">
+        <h2 className="section-title">My <span>Bookings</span></h2>
+        {bookings.length === 0 ? (
+          <p>No bookings yet.</p>
+        ) : (
+          <div className="bookings-list">
+            {bookings.map(booking => (
+              <div key={booking.id} className="booking-card">
+                <div className="booking-car-image">
+                  <img src={booking.car.image} alt={booking.car.name} />
+                </div>
+                <div className="booking-info">
+                  <h3>{booking.car.name}</h3>
+                  <p><strong>Booked By:</strong> {booking.name}</p>
+                  <p><strong>Email:</strong> {booking.email}</p>
+                  <p><strong>Phone:</strong> {booking.phone}</p>
+                  <p><strong>Pickup Date:</strong> {booking.pickupDate}</p>
+                  <p><strong>Return Date:</strong> {booking.returnDate}</p>
+                  <p><strong>Price:</strong> {booking.car.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        <button className="back-to-fleet-btn" onClick={() => setShowMyBookings(false)}>
+          Back to Fleet
+        </button>
+      </div>
+    </section>
+  );
+
+  const SectionNavBar = ({ showMyBookings, setShowMyBookings }) => (
+    <nav className="section-nav-bar">
+      <button
+        className={showMyBookings ? '' : 'active'}
+        onClick={() => setShowMyBookings(false)}
+      >
+        Fleet
+      </button>
+      <button
+        className={showMyBookings ? 'active' : ''}
+        onClick={() => setShowMyBookings(true)}
+      >
+        My Bookings
+      </button>
+    </nav>
+  );
+
   return (
     <>
-      <section className="car-fleet" id="fleet">
+      <SectionNavBar showMyBookings={showMyBookings} setShowMyBookings={setShowMyBookings} />
+      {showMyBookings ? (
+        <MyBookingsSection />
+      ) : (
+        <section className="car-fleet" id="fleet">
         <div className="container">
           <h2 className="section-title">Luxury Car <span>Fleet</span></h2>
           <p className="section-subtitle">Experience premium comfort and performance with our exclusive luxury collection</p>
@@ -574,6 +640,8 @@ const CarFleet = ({ filters = {} }) => {
           )}
         </div>
       </section>
+      )}
+      
 
       {/* Car Details Modal */}
       {showDetails && selectedCar && (

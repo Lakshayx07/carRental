@@ -29,14 +29,7 @@ const FAQ = () => {
       question: 'Do you offer delivery and pickup service?',
       answer: 'Yes, we offer free delivery and pickup within city limits. For airport and outstation deliveries, nominal charges may apply.'
     },
-    {
-      question: 'What is your fuel policy?',
-      answer: 'We provide the car with a full tank. Please return it with a full tank to avoid refueling charges at higher rates.'
-    },
-    {
-      question: 'Are there any hidden charges?',
-      answer: 'No hidden charges. All costs including insurance, taxes, and basic maintenance are included in the quoted price. Additional charges only apply for extra services or damages.'
-    }
+    
   ];
 
   const toggleFAQ = (index) => {

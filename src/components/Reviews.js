@@ -27,30 +27,7 @@ const Reviews = () => {
       date: '2 weeks ago',
       car: 'Porsche 911'
     },
-    {
-      id: 4,
-      name: 'Neha Gupta',
-      rating: 5,
-      comment: 'Excellent customer service. The Tesla Model S was incredible. 5-star experience!',
-      date: '3 weeks ago',
-      car: 'Tesla Model S'
-    },
-    {
-      id: 5,
-      name: 'Vikram Singh',
-      rating: 4,
-      comment: 'Smooth booking process. Range Rover was perfect for our family trip. Will use again.',
-      date: '1 month ago',
-      car: 'Range Rover'
-    },
-    {
-      id: 6,
-      name: 'Ananya Reddy',
-      rating: 5,
-      comment: 'Luxury at its best! The Audi R8 turned heads everywhere. Exceptional service!',
-      date: '1 month ago',
-      car: 'Audi R8'
-    }
+    
   ];
 
   const renderStars = (rating) => {

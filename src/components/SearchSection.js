@@ -39,12 +39,6 @@ const SearchSection = () => {
                   onChange={(e) => setPickupDate(e.target.value)}
                   required
                 />
-                <input 
-                  type="time" 
-                  value={pickupTime}
-                  onChange={(e) => setPickupTime(e.target.value)}
-                  required
-                />
               </div>
             </div>
             
@@ -57,18 +51,12 @@ const SearchSection = () => {
                   onChange={(e) => setReturnDate(e.target.value)}
                   required
                 />
-                <input 
-                  type="time" 
-                  value={returnTime}
-                  onChange={(e) => setReturnTime(e.target.value)}
-                  required
-                />
               </div>
             </div>
             
-            <button type="submit" className="search-button">
+            <a href='#fleet' className="search-button">
               Search Cars
-            </button>
+            </a>
           </form>
         </div>
       </div>

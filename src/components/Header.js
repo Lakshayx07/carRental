@@ -58,7 +58,6 @@ const Header = () => {
             <ul>
                 <li><a href="#home" onClick={(e) => { e.preventDefault(); handleNavClick('home'); }}>Home</a></li>
                 <li><a href="#fleet" onClick={(e) => { e.preventDefault(); handleNavClick('fleet'); }}>Our Fleet</a></li>
-                <li><a href="#offers" onClick={(e) => { e.preventDefault(); handleNavClick('offers'); }}>Offers</a></li>
                 <li><a href="#reviews" onClick={(e) => { e.preventDefault(); handleNavClick('reviews'); }}>Reviews</a></li>
                 <li><a href="#faq" onClick={(e) => { e.preventDefault(); handleNavClick('faq'); }}>FAQ</a></li>
                 <li><a href="#about" onClick={(e) => { e.preventDefault(); handleNavClick('about'); }}>About</a></li>
