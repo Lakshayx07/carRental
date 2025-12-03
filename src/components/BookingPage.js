@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/BookingPage.css';
 
@@ -19,18 +19,28 @@ const BookingPage = () => {
   });
 
   const [isBookingConfirmed, setIsBookingConfirmed] = useState(false);
+  const [bookings, setBookings] = useState([]);
+  const [loadingBookings, setLoadingBookings] = useState(false);
+  const [errorBookings, setErrorBookings] = useState(null);
 
-  if (!car) {
-    return (
-      <div className="booking-container">
-        <div className="error-message">
-          <h2>No Car Selected</h2>
-          <p>Please select a car to book first.</p>
-          <button onClick={() => navigate('/')} className="cta-button">Back to Home</button>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchBookings();
+  }, []);
+
+  const fetchBookings = async () => {
+    setLoadingBookings(true);
+    setErrorBookings(null);
+    try {
+      const res = await fetch('http://localhost:5000/api/booking');
+      if (!res.ok) throw new Error('Failed to fetch bookings');
+      const data = await res.json();
+      setBookings(data);
+    } catch (err) {
+      setErrorBookings(err.message);
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     setBookingData({
@@ -50,7 +60,7 @@ const BookingPage = () => {
     return 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate all fields
@@ -60,25 +70,36 @@ const BookingPage = () => {
       alert('Please fill all required fields!');
       return;
     }
-
     if (calculateTotal() <= 0) {
       alert('Please select valid pickup and return dates!');
       return;
     }
-
-    // Simulate booking process
-    setIsBookingConfirmed(true);
-    
-    // Save booking to localStorage
-    const booking = {
-      car: car,
-      bookingData: bookingData,
-      totalAmount: calculateTotal(),
-      bookingDate: new Date().toISOString(),
-      bookingId: 'BK' + Date.now()
+    // Prepare booking payload
+    const payload = {
+      user: '64b7e2f8c2a1d2e4f8a1b2c3', // Replace with actual user ID from auth if available
+      car: car.name,
+      startDate: bookingData.pickupDate,
+      endDate: bookingData.returnDate,
+      totalPrice: calculateTotal(),
+      fullName: bookingData.fullName,
+      email: bookingData.email,
+      phone: bookingData.phone,
+      address: bookingData.address,
+      licenseNumber: bookingData.licenseNumber,
+      paymentMethod: bookingData.paymentMethod
     };
-    
-    localStorage.setItem('lastBooking', JSON.stringify(booking));
+    try {
+      const res = await fetch('http://localhost:5000/api/booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error('Booking failed');
+      setIsBookingConfirmed(true);
+      fetchBookings(); // Refresh bookings list
+    } catch (err) {
+      alert('Booking failed: ' + err.message);
+    }
   };
 
   if (isBookingConfirmed) {
@@ -291,6 +312,25 @@ const BookingPage = () => {
             Confirm Booking - ₹{totalAmount.toLocaleString()}
           </button>
         </form>
+
+        {loadingBookings ? (
+          <div>Loading bookings...</div>
+        ) : errorBookings ? (
+          <div>Error: {errorBookings}</div>
+        ) : bookings.length > 0 ? (
+          <div className="bookings-list">
+            <h3>All Bookings</h3>
+            <ul>
+              {bookings.map((b) => (
+                <li key={b._id}>
+                  Car: {b.car}, User: {b.fullName || (b.user && b.user.email) || 'N/A'}, From: {new Date(b.startDate).toLocaleDateString()} To: {new Date(b.endDate).toLocaleDateString()}, Total: ₹{b.totalPrice}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <div>No bookings found.</div>
+        )}
       </div>
     </div>
   );
