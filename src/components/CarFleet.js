@@ -9,6 +9,8 @@ const CarFleet = ({ filters = {} }) => {
   const [bookings, setBookings] = useState([]);
   const [showMyBookings, setShowMyBookings] = useState(false);
 
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   // Wrap cars array in useMemo to prevent unnecessary re-renders
   const cars = useMemo(() => [
     {
@@ -470,19 +472,36 @@ const CarFleet = ({ filters = {} }) => {
       returnDate: ''
     });
 
-    const handleBookingSubmit = (e) => {
+    const handleBookingSubmit = async (e) => {
       e.preventDefault();
-      // Store booking in state
-      setBookings(prev => [
-        ...prev,
-        {
-          car: currentBookingCar,
-          ...bookingData,
-          id: Date.now()
-        }
-      ]);
-      closeBookingPage();
-      setShowMyBookings(true);
+      // Prepare booking payload
+      const payload = {
+        car: currentBookingCar.name,
+        carDetails: currentBookingCar,
+        name: bookingData.name,
+        email: bookingData.email,
+        phone: bookingData.phone,
+        pickupDate: bookingData.pickupDate,
+        returnDate: bookingData.returnDate,
+        price: currentBookingCar.price
+      };
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/booking`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Booking failed');
+        const savedBooking = await res.json();
+        setBookings(prev => [
+          ...prev,
+          savedBooking
+        ]);
+        closeBookingPage();
+        setShowMyBookings(true);
+      } catch (err) {
+        alert('Booking failed: ' + err.message);
+      }
     };
 
     return (
