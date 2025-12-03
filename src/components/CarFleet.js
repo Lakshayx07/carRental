@@ -9,7 +9,7 @@ const CarFleet = ({ filters = {} }) => {
   const [bookings, setBookings] = useState([]);
   const [showMyBookings, setShowMyBookings] = useState(false);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const API_BASE_URL = "https://car-rental-nu-silk.vercel.app" || 'http://localhost:5000';
 
   // Wrap cars array in useMemo to prevent unnecessary re-renders
   const cars = useMemo(() => [
