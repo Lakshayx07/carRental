@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/BookingPage.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const BookingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ const BookingPage = () => {
     setLoadingBookings(true);
     setErrorBookings(null);
     try {
-      const res = await fetch('http://localhost:5000/api/booking');
+      const res = await fetch(`${API_BASE_URL}/api/booking`);
       if (!res.ok) throw new Error('Failed to fetch bookings');
       const data = await res.json();
       setBookings(data);
@@ -89,7 +91,7 @@ const BookingPage = () => {
       paymentMethod: bookingData.paymentMethod
     };
     try {
-      const res = await fetch('http://localhost:5000/api/booking', {
+      const res = await fetch(`${API_BASE_URL}/api/booking`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
