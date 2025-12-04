@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import SearchSection from './components/SearchSection';
 import CarFilter from './components/CarFilter'; // Add this import
 import CarFleet from './components/CarFleet';
 import HowItWorks from './components/HowItWorks';
@@ -28,7 +27,6 @@ function App() {
     <div className="App">
       <Header />
       <Hero />
-      <SearchSection />
       <CarFilter onFilterChange={handleFilterChange} /> {/* Add this line */}
       <CarFleet filters={carFilters} /> {/* Update this line */}
       <HowItWorks />
