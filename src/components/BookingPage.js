@@ -170,7 +170,7 @@ const BookingPage = () => {
       <div className="booking-content">
         <div className="car-summary">
           <div className="car-image">
-            <img src={car.image} alt={car.name} />
+            <img src={car?.image} alt={car.name} />
           </div>
           <div className="car-details">
             <h3>{car.name}</h3>

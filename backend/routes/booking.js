@@ -6,7 +6,16 @@ const Booking = require('../models/Booking');
 router.post('/', async (req, res) => {
   console.log('[POST] /api/booking - Payload:', req.body);
   try {
-    const booking = new Booking(req.body);
+    const { startDate, endDate, totalPrice, fullName, email, phone, imgUrl } = req.body;
+    const booking = new Booking({
+      startDate,
+      endDate,
+      totalPrice,
+      fullName,
+      email,
+      phone,
+      imgUrl
+    });
     await booking.save();
     console.log('[POST] /api/booking - Booking created:', booking);
     res.status(201).json(booking);
@@ -20,7 +29,7 @@ router.post('/', async (req, res) => {
 router.get('/', async (req, res) => {
   console.log('[GET] /api/booking - Fetching all bookings');
   try {
-    const bookings = await Booking.find().populate('user');
+    const bookings = await Booking.find();
     console.log('[GET] /api/booking - Bookings found:', bookings.length);
     res.json(bookings);
   } catch (err) {
@@ -33,7 +42,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   console.log(`[GET] /api/booking/${req.params.id} - Fetching booking`);
   try {
-    const booking = await Booking.findById(req.params.id).populate('user');
+    const booking = await Booking.findById(req.params.id);
     if (!booking) {
       console.warn(`[GET] /api/booking/${req.params.id} - Booking not found`);
       return res.status(404).json({ error: 'Booking not found' });
@@ -50,7 +59,12 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', async (req, res) => {
   console.log(`[PUT] /api/booking/${req.params.id} - Update payload:`, req.body);
   try {
-    const booking = await Booking.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const { startDate, endDate, totalPrice, fullName, email, phone, imgUrl } = req.body;
+    const booking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      { startDate, endDate, totalPrice, fullName, email, phone, imgUrl },
+      { new: true }
+    );
     if (!booking) {
       console.warn(`[PUT] /api/booking/${req.params.id} - Booking not found`);
       return res.status(404).json({ error: 'Booking not found' });

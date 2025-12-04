@@ -19,6 +19,7 @@ const isValidPassword = (pw) => {
 router.post('/signup', async (req, res) => {
   try {
     const { name, email, phone, city, password } = req.body;
+    console.log('Signup attempt:', req.body);
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email and password are required' });
     }

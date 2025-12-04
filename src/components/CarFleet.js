@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import '../styles/CarFleet.css';
 
 const CarFleet = ({ filters = {} }) => {
@@ -9,7 +9,7 @@ const CarFleet = ({ filters = {} }) => {
   const [bookings, setBookings] = useState([]);
   const [showMyBookings, setShowMyBookings] = useState(false);
 
-  const API_BASE_URL = "https://car-rental-nu-silk.vercel.app" || 'http://localhost:5000';
+  const API_BASE_URL = 'http://localhost:3001';
 
   // Wrap cars array in useMemo to prevent unnecessary re-renders
   const cars = useMemo(() => [
@@ -395,14 +395,14 @@ const CarFleet = ({ filters = {} }) => {
   const filteredCars = useMemo(() => {
     return cars.filter(car => {
       // Brand filter
-      if (filters.brand && !car.name.toLowerCase().includes(filters.brand.toLowerCase())) {
+      if (filters.brand && !car?.name.toLowerCase().includes(filters.brand.toLowerCase())) {
         return false;
       }
 
       // Price range filter
-      if (filters.priceRange) {
-        const price = parseInt(car.price.replace(/[^\d]/g, ''));
-        switch (filters.priceRange) {
+      if (filters?.priceRange) {
+        const price = parseInt(car?.price.replace(/[^\d]/g, ''));
+        switch (filters?.priceRange) {
           case 'Under ₹10,000/day':
             if (price >= 10000) return false;
             break;
@@ -476,14 +476,13 @@ const CarFleet = ({ filters = {} }) => {
       e.preventDefault();
       // Prepare booking payload
       const payload = {
-        car: currentBookingCar.name,
-        carDetails: currentBookingCar,
-        name: bookingData.name,
+        imgUrl: currentBookingCar?.image,
+        startDate: bookingData.pickupDate,
+        endDate: bookingData.returnDate,
+        totalPrice: parseInt(currentBookingCar?.price.replace(/[^\d]/g, '')) * (bookingData.pickupDate && bookingData.returnDate ? Math.max(1, Math.ceil((new Date(bookingData.returnDate) - new Date(bookingData.pickupDate)) / (1000 * 60 * 60 * 24))) : 1),
+        fullName: bookingData?.name,
         email: bookingData.email,
-        phone: bookingData.phone,
-        pickupDate: bookingData.pickupDate,
-        returnDate: bookingData.returnDate,
-        price: currentBookingCar.price
+        phone: bookingData.phone
       };
       try {
         const res = await fetch(`${API_BASE_URL}/api/booking`, {
@@ -508,11 +507,11 @@ const CarFleet = ({ filters = {} }) => {
       <div className="modal-overlay" onClick={closeBookingPage}>
         <div className="modal-content booking-modal" onClick={(e) => e.stopPropagation()}>
           <button className="close-btn" onClick={closeBookingPage}>×</button>
-          <h2>Book {currentBookingCar.name}</h2>
+          <h2>Book {currentBookingCar?.name}</h2>
           <form onSubmit={handleBookingSubmit}>
             <div className="form-group">
               <input type="text" placeholder="Full Name" required 
-                value={bookingData.name} 
+                value={bookingData?.name} 
                 onChange={(e) => setBookingData({...bookingData, name: e.target.value})} 
               />
             </div>
@@ -557,18 +556,18 @@ const CarFleet = ({ filters = {} }) => {
         ) : (
           <div className="bookings-list">
             {bookings.map(booking => (
-              <div key={booking.id} className="booking-card">
+              <div key={booking._id || booking.id} className="booking-card">
                 <div className="booking-car-image">
-                  <img src={booking.car.image} alt={booking.car.name} />
+                  <img src={booking.imgUrl} alt={booking.fullName + "'s booking car"} />
                 </div>
                 <div className="booking-info">
-                  <h3>{booking.car.name}</h3>
-                  <p><strong>Booked By:</strong> {booking.name}</p>
+                  <h3>{booking.fullName}</h3>
                   <p><strong>Email:</strong> {booking.email}</p>
                   <p><strong>Phone:</strong> {booking.phone}</p>
-                  <p><strong>Pickup Date:</strong> {booking.pickupDate}</p>
-                  <p><strong>Return Date:</strong> {booking.returnDate}</p>
-                  <p><strong>Price:</strong> {booking.car.price}</p>
+                  <p><strong>Start Date:</strong> {booking.startDate ? new Date(booking.startDate).toLocaleDateString() : ''}</p>
+                  <p><strong>End Date:</strong> {booking.endDate ? new Date(booking.endDate).toLocaleDateString() : ''}</p>
+                  <p><strong>Total Price:</strong> ₹{booking.totalPrice?.toLocaleString()}</p>
+                  <p><strong>Created At:</strong> {booking.createdAt ? new Date(booking.createdAt).toLocaleString() : ''}</p>
                 </div>
               </div>
             ))}
@@ -598,6 +597,23 @@ const CarFleet = ({ filters = {} }) => {
     </nav>
   );
 
+  useEffect(() => {
+    if (showMyBookings) {
+      fetchBookings();
+    }
+  }, [showMyBookings]);
+
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/booking`);
+      if (!res.ok) throw new Error('Failed to fetch bookings');
+      const data = await res.json();
+      setBookings(data);
+    } catch (err) {
+      alert('Failed to fetch bookings: ' + err.message);
+    }
+  };
+
   return (
     <>
       <SectionNavBar showMyBookings={showMyBookings} setShowMyBookings={setShowMyBookings} />
@@ -625,12 +641,12 @@ const CarFleet = ({ filters = {} }) => {
             {filteredCars.map(car => (
               <div key={car.id} className="car-card">
                 <div className="car-image">
-                  <img src={car.image} alt={car.name} />
+                  <img src={car?.image} alt={car?.name} />
                   <div className="car-type">{car.type}</div>
-                  <div className="car-price-badge">{car.price}</div>
+                  <div className="car-price-badge">{car?.price}</div>
                 </div>
                 <div className="car-info">
-                  <h3>{car.name}</h3>
+                  <h3>{car?.name}</h3>
                   <div className="button-group">
                     <button 
                       className="know-more-btn"
@@ -669,13 +685,13 @@ const CarFleet = ({ filters = {} }) => {
             <button className="close-btn" onClick={closeDetails}>×</button>
             
             <div className="modal-header">
-              <h2>{selectedCar.name}</h2>
+              <h2>{selectedCar?.name}</h2>
               <p className="car-type-badge">{selectedCar.type}</p>
             </div>
 
             <div className="modal-body">
               <div className="modal-image">
-                <img src={selectedCar.image} alt={selectedCar.name} />
+                <img src={selectedCar?.image} alt={selectedCar?.name} />
               </div>
               
               <div className="modal-details">
@@ -719,7 +735,7 @@ const CarFleet = ({ filters = {} }) => {
                 </div>
 
                 <div className="price-section-modal">
-                  <div className="modal-price">{selectedCar.price}</div>
+                  <div className="modal-price">{selectedCar?.price}</div>
                   <button 
                     className="modal-book-btn"
                     onClick={() => {

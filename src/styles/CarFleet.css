@@ -387,7 +387,7 @@
   min-height: 60vh;
 }
 .my-bookings .container {
-  max-width: 900px;
+  /* max-width: 900px; */
   margin: 0 auto;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(102,126,234,0.08);

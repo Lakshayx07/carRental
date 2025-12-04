@@ -13,13 +13,7 @@ const PORT = process.env.PORT || 5002;
 //   next();
 // });
 
-app.use(cors({
-  origin: [
-    'http://localhost:3000',
-    'https://car-rental-nu-silk.vercel.app'
-  ],
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
@@ -65,6 +59,6 @@ app.get('/api/health', (req, res) => {
 });
 
 // No DB connection needed for dev
-app.listen(PORT, () => {
+app.listen(3001, () => {
   console.log(`Server running on port ${PORT}`);
 });

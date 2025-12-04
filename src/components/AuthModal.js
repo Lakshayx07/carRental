@@ -48,14 +48,14 @@ const AuthModal = ({ isOpen, onClose, onLogin }) => {
       }
     }
 
-    const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+    const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 
     try {
       const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
       const body = isLogin
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, phone: formData.phone, city: formData.city, password: formData.password };
-
+        
       const res = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
